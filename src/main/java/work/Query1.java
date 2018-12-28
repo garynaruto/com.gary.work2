@@ -10,7 +10,8 @@ import com.github.davidmoten.rtree.geometry.Geometries;
 import com.github.davidmoten.rtree.geometry.Geometry;
 import com.github.davidmoten.rtree.geometry.Point;
 
-import Ver2.Combination;
+import Ver2.*;
+
 import preproess.*;
 
 public class Query1 {
@@ -53,12 +54,12 @@ public class Query1 {
 		Path.sLoc = start;
 		Path.dLoc = end;
 		Path.map = m;
-		
+		Combination.map = m;
 		long startTime = System.currentTimeMillis();
 		/* enumerate combination */
 		List<Combination> combinations = eum(start, end, queryPOI ,stree);
 		
-		System.out.println("combinations : "+combinations.size() );
+		System.out.println("combinations : " + combinations.size() );
 		//combinations.forEach(a->System.out.println(a));
 //		System.out.println("start : "+start );
 //		System.out.println("end : "+end );
@@ -68,30 +69,30 @@ public class Query1 {
 //		System.out.println("queryTime : "+queryTime );
 		
 		/* calculate combination Score */
-//		Queue<Combination> queue = calScore(combinations, queryTime);
+		Queue<Combination> queue = calScore(combinations);
 		
-		//queue.forEach(a->System.out.println( queryTime +a.time));
+		queue.forEach(a->{});
 		
 		/* find real-path with pruning */
-		//System.out.println("find real-path :");
-//		Path ans = new Path(Integer.MAX_VALUE);
-//		int i=0;
-//		while(!queue.isEmpty()) {
-//			//System.out.println(i);
-//			Combination tmp = queue.poll();
-//			//System.out.println(" tmp :"+ tmp);
-//			if(queryTime + tmp.time > ans.time) {
-//				System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
-//				System.out.println("break : "+ i);
-//				break;
-//			}
-//			//System.out.println(" open :");
-//			Path p = openCom(tmp, elist,stationList,queryTime, ans.time);
-//			if(p != null && p.time < ans.time) {
-//				ans = p;
-//			}
-//			i++;
-//		}
+		System.out.println("find real-path :");
+		Path2 ans = new Path2(Integer.MAX_VALUE);
+		int i=0;
+		while(!queue.isEmpty()) {
+			//System.out.println(i);
+			Combination tmp = queue.poll();
+			//System.out.println(" tmp :"+ tmp);
+			if(queryTime + tmp.time > ans.time) {
+				//System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
+				System.out.println("break : "+ i);
+				break;
+			}
+			//System.out.println(" open :");
+			Path2 p = openCom2(tmp, elist, stationList, queryTime, ans.time);
+			if(p != null && p.time < ans.time) {
+				ans = p;
+			}
+			i++;
+		}
 		
 		
 		
@@ -100,37 +101,52 @@ public class Query1 {
 //		System.out.println("Time : "+ (endTime-startTime));
 //		System.out.println("done");
 	}
+	public static Path2 openCom2(Combination com, List<Edge> elist, List<Station> stationList, int queryTime, int bestTime) {
+		Path2 out = new Path2();
+		
+		for(Step s :com.stepList) {
+			if(s.way == Step.Action.bus) {
+				
+			}
+			else {
+				out.stepList.add(s);
+			}
+		}
+		
+		
+		return out;//min time real-path in this combination
+	}
+	
 	//展開組合成為一條real-path       p to Combination
-//	public static Path openCom(Path p, List<Edge> elist,List<Station> stationList, int queryTime, int bestTime) {
-//		
-//		/* 起點  to POI1*/
-//		Expansion e = Dijkstra.ExpandStation(elist,stationList,p.s,p.Stationlist.get(0),p.POIlist.get(0), queryTime);
-//		p.edgeList.addAll(e.edgeList);
-//		p.time = e.time;
-//		
-//		for(int i=0;i<p.Stationlist.size()-1; i++) {
-//			e = Dijkstra.ExpandStation(elist,stationList,p.Stationlist.get(i), p.Stationlist.get(i+1),p.POIlist.get(i+1), p.time);
-//			p.time = e.time;
-//			p.edgeList.addAll(e.edgeList);
-//			//if(p.time + p.distime > bestTime) {
-//			//	return null;
-//			//}
-//		}
-//		
-//		/* 終點  to POIn */
-//		e = Dijkstra.ExpandStation(elist,stationList,p.Stationlist.get(p.Stationlist.size()-1),p.d, null,p.time);
-//		p.time = p.distime + e.time;
-//		p.edgeList.addAll(e.edgeList);
-//		
-//		return p;//min time real-path in this combination
-//	}
-//	
-	private static Queue<Combination> calScore(List<Combination> combinations, int queryTime ) {
+	public static Path openCom(Path p, List<Edge> elist,List<Station> stationList, int queryTime, int bestTime) {
+		
+		/* 起點  to POI1*/
+		Expansion e = Dijkstra.ExpandStation(elist,stationList,p.s,p.Stationlist.get(0),p.POIlist.get(0), queryTime);
+		p.edgeList.addAll(e.edgeList);
+		p.time = e.time;
+		
+		for(int i=0;i<p.Stationlist.size()-1; i++) {
+			e = Dijkstra.ExpandStation(elist,stationList,p.Stationlist.get(i), p.Stationlist.get(i+1),p.POIlist.get(i+1), p.time);
+			p.time = e.time;
+			p.edgeList.addAll(e.edgeList);
+			//if(p.time + p.distime > bestTime) {
+			//	return null;
+			//}
+		}
+		
+		/* 終點  to POIn */
+		e = Dijkstra.ExpandStation(elist,stationList,p.Stationlist.get(p.Stationlist.size()-1),p.d, null,p.time);
+		p.time = p.distime + e.time;
+		p.edgeList.addAll(e.edgeList);
+		
+		return p;//min time real-path in this combination
+	}
+	
+	private static Queue<Combination> calScore(List<Combination> combinations) {
 		Queue<Combination> out = new LinkedList<>();
 		PriorityQueue<Combination> queue = new PriorityQueue<>();
 		combinations.forEach(tmp->tmp.getTime());
 		queue.addAll(combinations);
-		
 		
 		while(!queue.isEmpty()) {
 			out.add(queue.poll());
@@ -155,8 +171,9 @@ public class Query1 {
 		//add start Station
 		List<Combination> comList = new ArrayList<Combination>();
 		for(int i=0; i<startStation.size();i++) {
-			Combination c = new Combination (startStation.get(i));
-			c.pList.add(0, startPosition);
+			Combination c = new Combination();
+			c.pList.add(startPosition);
+			c.pList.add(startStation.get(i));
 			comList.add(c);
 		}
 		
@@ -182,9 +199,7 @@ public class Query1 {
 			}
 			p.POIiStation = POIiStation;
 			//System.out.println(POIiStation);
-		}
-		
-		
+		}		
 		//foreach start Station add foreach POIs Permutation
 		for(Combination paths : comList) {
 			for(List<POI> Permutation : POIsPermutation) {
@@ -205,13 +220,13 @@ public class Query1 {
 				}
 			}
 		}
+		
 		/*add ends Stations*/
 		comList = newComList;
 		newComList = new ArrayList<Combination>();
 		for(Combination  a : comList){
 			for(Station ends : endStation) {
 				Combination tmp = new Combination(a);//new path without copy attribute
-				tmp.d = ends;
 				tmp.pList.add(ends);
 				tmp.pList.add(endPosition);
 				newComList.add(tmp);

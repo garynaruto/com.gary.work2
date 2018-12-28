@@ -47,6 +47,7 @@ public class mainClass {
 		}
 		for(Station s : stationList) {
 			for(Station s2 : stationList) {
+				// need update
 				out.put(s.name+s2.name, Math.hypot(s.x-s2.x, s.y-s2.y));
 			}
 		}

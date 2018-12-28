@@ -7,7 +7,7 @@ import com.github.davidmoten.rtree.geometry.Point;
 import preproess.*;
 import work.*;
 
-public class Query1ver2 {
+public class Query2 {
 	//RTree<Position, Geometry> tree = RTree.star().minChildren(3).maxChildren(6).create();//RTree.asString()
 	
 		public static int min = 1;// minChildren
