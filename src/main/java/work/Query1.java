@@ -20,7 +20,7 @@ public class Query1 {
 	public static int min = 1;// minChildren
 	public static int max = 6;// maxChildren
 	public static int k = 4;  //k of KNN
-	public static int disTotime = 1;
+	public static int disTotime = 12; //walk Parameter
 	public static void main(String[] args) {
 		
 		/* read POI data & build Rtree */
@@ -71,7 +71,12 @@ public class Query1 {
 		/* calculate combination Score */
 		Queue<Combination> queue = calScore(combinations);
 		
-		queue.forEach(a->{});
+		//queue.forEach(a->{System.out.println(a);});
+		
+		for(int i=0; i<100; i++) {
+			System.out.println(queue.poll());
+		}
+		
 		
 		/* find real-path with pruning */
 		System.out.println("find real-path :");
@@ -80,6 +85,7 @@ public class Query1 {
 		while(!queue.isEmpty()) {
 			//System.out.println(i);
 			Combination tmp = queue.poll();
+			//System.out.println("queue.poll"+tmp);
 			//System.out.println(" tmp :"+ tmp);
 			if(queryTime + tmp.time > ans.time) {
 				//System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
@@ -90,30 +96,58 @@ public class Query1 {
 			Path2 p = openCom2(tmp, elist, stationList, queryTime, ans.time);
 			if(p != null && p.time < ans.time) {
 				ans = p;
+				System.out.println("ans update ["+i+"] :"+ ans);
+				
 			}
 			i++;
 		}
 		
-		
-		
 		long endTime = System.currentTimeMillis();
-//		System.out.println("ans>"+ans);
-//		System.out.println("Time : "+ (endTime-startTime));
-//		System.out.println("done");
+		System.out.println("ans>"+ans);
+		System.out.println("CPU Time : "+ (endTime-startTime));
+		System.out.println("done");
 	}
 	public static Path2 openCom2(Combination com, List<Edge> elist, List<Station> stationList, int queryTime, int bestTime) {
 		Path2 out = new Path2();
-		
+		List<Edge> realPath = null;
+		System.out.println("openCom2 : "+com);
+		out.time = queryTime;
 		for(Step s :com.stepList) {
 			if(s.way == Step.Action.bus) {
+				System.out.println("Step.Action.bus");
+				s.starTime = out.time;
+				out.time += Step.findrealPath(realPath, s);
+				if(realPath == null) {
+					return null;
+				}
+				s.Edges = new ArrayList<Edge>(realPath);
+				out.stepList.add(s);
 				
 			}
 			else {
-				out.stepList.add(s);
+				if(s.way == Step.Action.POI) {
+					System.out.println("Step.Action.POI");
+					//check wait or not or can't 
+					s.starTime = out.time;
+					POI target = (POI)s.a;
+					if (s.starTime+target.stayTime > target.endTime ){
+						return null;
+					}
+					if (s.starTime < target.starTime) {//wait POI open
+						s.waitTime = target.starTime - s.starTime;
+						out.time += s.waitTime;
+					}
+					out.time += target.stayTime;
+					out.stepList.add(s);
+					
+				}else if(s.way == Step.Action.walk) {
+					System.out.println("Step.Action.walk");
+					s.starTime = out.time;
+					out.time += s.costTime;
+					out.stepList.add(s);
+				}
 			}
 		}
-		
-		
 		return out;//min time real-path in this combination
 	}
 	

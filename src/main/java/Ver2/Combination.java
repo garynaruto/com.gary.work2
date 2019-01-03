@@ -2,6 +2,7 @@ package Ver2;
 import java.util.*;
 import preproess.*;
 import preproess.Step.Action;
+import work.Query1;
 public class Combination implements Comparable<Combination>{
 	
 	public List<Position> pList;
@@ -24,8 +25,8 @@ public class Combination implements Comparable<Combination>{
 	@Override
 	public String toString() {
 		String s = "";
-		for(Position p : pList) {
-			s+="->"+p;
+		for(Step p : stepList) {
+			s+="["+p.a+"-"+p.b+"]";
 		}
 		
 		return s;
@@ -60,11 +61,12 @@ public class Combination implements Comparable<Combination>{
 				//idealTime map
 				out = map.get(a.name+b.name);
 				stepList.add(new Step(a, b, (int)out, Step.Action.bus));
+				
 				return (int)out;
 			}
 		}
 		
-		out = Math.hypot(a.x-b.x, a.y-b.y);
+		out = walkParameter(Math.hypot(a.x-b.x, a.y-b.y));
 		stepList.add(new Step(a, b, (int)out, Step.Action.walk));
 		
 		if(b instanceof POI) {
@@ -79,6 +81,11 @@ public class Combination implements Comparable<Combination>{
 	public int compareTo(Combination arg0) {
 
 		return this.time - arg0.time;
+		
+	}
+	public int walkParameter(double d) {
+
+		return (int)(d*Query1.disTotime);
 		
 	}
 }

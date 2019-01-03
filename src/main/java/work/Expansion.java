@@ -21,7 +21,7 @@ public class Expansion implements Comparable<Expansion>{
 		List<Edge> next = null;
 		if(this.edgeList.isEmpty()) {
 			//System.out.println("edgeList.isEmpty()");
-			next = getavalibleTimeEdge(this.s.edgeList, time);
+			next = getavalibleTimeEdge(this.s.edgeList, this.time);
 		}
 		else {
 			Edge lastEdge = this.edgeList.get(edgeList.size()-1);  //last Edge
@@ -31,13 +31,14 @@ public class Expansion implements Comparable<Expansion>{
 		for(Edge tmp : next) {
 			Expansion e = new Expansion(this);
 			e.time += tmp.costTime + (tmp.starTime - time);
+			
 			e.edgeList.add(tmp);
 			out.add(e);
 		}
 		return out;
 	}
 	//Pruning the next Edge with time limit
-	public List<Edge> getavalibleTimeEdge(List<Edge> edgeList,int time){
+	public List<Edge> getavalibleTimeEdge(List<Edge> edgeList, int time){
 		//System.out.println("getavalibleTimeEdge()");
 		List<Edge> out = new ArrayList<Edge>();
 		for(Edge e : edgeList ) {
@@ -50,7 +51,7 @@ public class Expansion implements Comparable<Expansion>{
 	}
 	
 	@Override
-	public int compareTo( Expansion b) {
+	public int compareTo(Expansion b) {
 		if (this.time > b.time) 
             return 1;
         else if (this.time < b.time) 
