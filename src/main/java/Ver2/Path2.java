@@ -4,10 +4,7 @@ import java.util.List;
 import preproess.Step;
 
 public class Path2 {
-	@Override
-	public String toString() {
-		return "Path2 [time=" + time + ", stepList=" + stepList + "]";
-	}
+	
 	public int time;
 	public List<Step> stepList;
 	
@@ -20,5 +17,10 @@ public class Path2 {
 		super();
 		this.time = 0;
 		stepList = new ArrayList<Step>();
+	}
+	
+	@Override
+	public String toString() {
+		return "Path2 [time=" + time + ", stepList=" + stepList + "]";
 	}
 }

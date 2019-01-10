@@ -1,8 +1,8 @@
 package Ver2;
 import java.util.*;
 import preproess.*;
-import preproess.Step.Action;
 import work.Query1;
+
 public class Combination implements Comparable<Combination>{
 	
 	public List<Position> pList;
@@ -32,10 +32,7 @@ public class Combination implements Comparable<Combination>{
 		return s;
 	}
 	
-	//¥¼§¹¦¨
-	
 	public int getTime(){
-//		if(time > 0)return time;
 		for(int i=0; i<pList.size()-1; i++) {
 			Position a = pList.get(i);
 			Position b = pList.get(i+1);

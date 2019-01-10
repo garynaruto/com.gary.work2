@@ -12,7 +12,7 @@ import com.github.davidmoten.rtree.geometry.Point;
 import Ver2.*;
 import preproess.*;
 
-public class Query1 {
+public class Query2 {
 	//RTree<Position, Geometry> tree = RTree.star().minChildren(3).maxChildren(6).create();//RTree.asString()
 	public static int min = 1;// minChildren
 	public static int max = 6;// maxChildren
@@ -57,53 +57,32 @@ public class Query1 {
 		List<Combination> combinations = eum(start, end, queryPOI ,stree);
 		
 		System.out.println("combinations : " + combinations.size() );
-		//combinations.forEach(a->System.out.println(a));
-//		System.out.println("start : "+start );
-//		System.out.println("end : "+end );
-//		System.out.println("queryPOI : "+queryPOI );
-//		System.out.println("combinations : "+combinations );
-//		System.out.println("combinations : "+combinations.size() );
-//		System.out.println("queryTime : "+queryTime );
-		
-		/* calculate combination Score */
-		Queue<Combination> queue = calScore(combinations);
-		
-		//queue.forEach(a->{System.out.println(a);});
 		
 		for(int i=0; i<100; i++) {
-			System.out.println(queue.poll());
+			System.out.println(combinations.get(i).pList);
 		}
+		TreeNode root = treeBuilder(combinations);
+		//System.out.println(combinations.get(0).pList.get(0).getClass());
 		
-		
-		/* find real-path with pruning */
-		System.out.println("find real-path :");
-		Path2 ans = new Path2(Integer.MAX_VALUE);
-		int i=0;
-		while(!queue.isEmpty()) {
-			//System.out.println(i);
-			Combination tmp = queue.poll();
-			//System.out.println("queue.poll"+tmp);
-			//System.out.println(" tmp :"+ tmp);
-			if(queryTime + tmp.time > ans.time) {
-				//System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
-				System.out.println("break : "+ i);
-				break;
-			}
-			//System.out.println(" open :");
-			Path2 p = openCom2(tmp, elist, stationList, queryTime, ans.time);
-			if(p != null && p.time < ans.time) {
-				ans = p;
-				System.out.println("ans update ["+i+"] :"+ ans);
-				
-			}
-			i++;
-		}
 		
 		long endTime = System.currentTimeMillis();
-		System.out.println("ans>"+ans);
+		//System.out.println("ans>"+ans);
 		System.out.println("CPU Time : "+ (endTime-startTime));
 		System.out.println("done");
 	}
+	
+	public static TreeNode treeBuilder(List<Combination> combinations) {
+		TreeNode root = new TreeNode();
+		root.p = combinations.get(0).pList.get(0);
+		for(Combination c : combinations) {
+			for(int i=0; i<c.pList.size(); i++) {
+				
+			}
+		}
+		return root;
+	}
+	
+	
 	public static Path2 openCom2(Combination com, List<Edge> elist, List<Station> stationList, int queryTime, int bestTime) {
 		Path2 out = new Path2();
 		List<Edge> realPath = null;
@@ -173,7 +152,7 @@ public class Query1 {
 		});
 		
 		
-		/*new path*/
+		/*new Combination*/
 		//add start Station
 		List<Combination> comList = new ArrayList<Combination>();
 		for(int i=0; i<startStation.size();i++) {
