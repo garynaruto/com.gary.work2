@@ -5,6 +5,10 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+
+import Ver2.Combination;
+
 import java.util.ArrayList;
 import java.util.HashMap; 
 
@@ -46,11 +50,21 @@ public class mainClass {
 			}
 		}
 		for(Station s : stationList) {
+			PriorityQueue<Edge> queue = new PriorityQueue<Edge>();
 			for(Station s2 : stationList) {
-				// need update
-				out.put(s.name+s2.name, Math.hypot(s.x-s2.x, s.y-s2.y));
+				Double d =Math.hypot(s.x-s2.x, s.y-s2.y);
+				out.put(s.name+s2.name, d);
+				if(s!=s2) {
+					queue.add(new Edge(Line.getWalk(),s,s2,0,Combination.walkParameter(d)));
+				}
+			}
+			for(int i=0;i<5; i++) {
+				s.walkedgeList.add(queue.poll());
 			}
 		}
+		
+		
+		
 		return out;
 	}
 	public static boolean writeStarTimeData(String file,List<Station> stationList) {

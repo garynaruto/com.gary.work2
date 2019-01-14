@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Line {
+	public static Line walk;
 	public String name;
 	public List<Station> SList;
 	public List<Integer> timeList;
@@ -32,12 +33,18 @@ public class Line {
 				return true;
 			}
 			else {
-				System.out.println("Line addStation : Error repeated ");
-				throw new Exception("Line addStation : Error repeated ");
+				//System.out.println("Line addStation : Error repeated ");
+				//System.out.println("tmp : "+tmp);
+				//throw new Exception("Line addStation : Error repeated ");
+				SList.add(tmp);
+				timeList.add(Integer.parseInt(time));
+				tmp.addLine(this);
+				return true;
 			}		
 		}
 		else {
 			System.out.println("Line addStation : s not in stationList ");
+			System.out.println(" s : "+s);
 			throw new Exception("Line addStation : s not in stationList ");
 		}
 	}
@@ -50,5 +57,12 @@ public class Line {
 		//return "[L:"+name+s+"]";
 		//return "[L:"+s+"]";
 		return "L:"+name+" ";
+	}
+	public static Line getWalk() {
+		if(Line.walk != null) {
+			return Line.walk;
+		}
+		Line.walk = new Line("walk");
+		return Line.walk;
 	}
 }

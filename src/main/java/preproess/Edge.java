@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class Edge extends Step{
+public class Edge extends Step implements Comparable<Edge>{
 	public Line l;
 	
 	public Edge(Line l,Station a, Station b, int starTime, int costTime) {
@@ -31,5 +31,10 @@ public class Edge extends Step{
 			e.printStackTrace();
 		}
 		return true;
+	}
+	@Override
+	public int compareTo(Edge obj) {
+		
+		return this.costTime - obj.costTime;
 	}
 }

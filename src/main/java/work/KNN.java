@@ -62,9 +62,12 @@ public class KNN {
 		PriorityQueue<Entry<Position, Geometry>> a = nn(tree, p , k);
 		//a.forEach(t ->output.add(t));
 		//a.forEach(t ->System.out.println(t));
-		while(!a.isEmpty()) {
+		for(int i=0; i<k && !a.isEmpty(); i++) {
 			output.add((Station)a.poll().value());
 		}
+//		while(!a.isEmpty()) {
+//			output.add((Station)a.poll().value());
+//		}
 		return output;
 	}
 	public static PriorityQueue<Entry<Position, Geometry>> nn(RTree<Position, Geometry> r, Point p, int k) {

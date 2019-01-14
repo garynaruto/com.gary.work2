@@ -5,7 +5,7 @@ import java.util.PriorityQueue;
 import work.Expansion;
 
 public class Step {
-	
+	public static List<Station> stationList;
 	public Position a;
 	public Position b;
 	public int starTime;
@@ -34,22 +34,31 @@ public class Step {
 		return "[" + a + "-" + b +"]";
 	}
 	public static int findrealPath(List<Edge> ans, Step src){
-		System.out.println("findrealPath " +src.a.name +"-"+ src.b.name);
+		stationList.forEach(a->a.visit=false);
+		//System.out.println("findrealPath [" +src.a.name +"-"+ src.b.name+"]");
 		PriorityQueue<Expansion> queue = new PriorityQueue<Expansion>();
 		
 		queue.add(new Expansion((Station)src.a, (Station)src.b, src.starTime));
+		//int i=0;
 		while(!queue.isEmpty()) {
+//			i++;
+//			if(i>10) {
+//				break;
+//			}
 			Expansion e = queue.poll();
-			System.out.println("poll :" +e.edgeList);
-			if(!e.edgeList.isEmpty() && e.edgeList.get(e.edgeList.size()-1).b.equals(src.b)) {
-				System.out.println("realPath :" +e.edgeList);
-				ans = e.edgeList;
+			//System.out.println("poll :" +e.edgeList);
+			if(!e.edgeList.isEmpty() && e.edgeList.get(e.edgeList.size()-1).b.name.equals(src.b.name)) {
+				//System.out.println("realPath :" +e.edgeList);
+				ans.addAll(e.edgeList);
 				return e.time;
 			}
 			List<Expansion> tmp = e.simExpandPath();
+			//System.out.println("e :" +e);
+			//System.out.println("ADD :" +tmp);
 			queue.addAll(tmp);
 			//tmp.forEach(t->System.out.println("->"+t));
 		}
+		System.out.println("No realPath");
 		ans = null;
 		return 0;//no ans
 	}

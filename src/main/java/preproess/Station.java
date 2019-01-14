@@ -7,6 +7,8 @@ public class Station extends Position{
 	public List<Line> lList;
 	public List<BusTime> busTable;
 	public List<Edge> edgeList;
+	public List<Edge> walkedgeList;
+	public boolean visit = false;
 	public Station(String[] s) throws Exception {
 		if(s.length!=3) {
 			System.out.println("Station constructor : Error length != 3");
@@ -18,6 +20,8 @@ public class Station extends Position{
 		lList = new ArrayList<Line>();
 		busTable = new ArrayList<BusTime>();
 		edgeList = new ArrayList<Edge>();
+		walkedgeList = new ArrayList<Edge>();
+		
 	}
 	
 	@Override
@@ -35,14 +39,16 @@ public class Station extends Position{
 		// TODO Auto-generated method stub
 		return super.equals(obj);
 	}
-	public boolean addLine(Line s) throws Exception {
+	public boolean addLine(Line s) {// throws Exception
 		if(lList.indexOf(s)==-1) {
 			lList.add(s);
 			return true;
 		}
 		else {
-			System.out.println("Station add Line : Error repeated ");
-			throw new Exception("Station add Line : Error repeated ");
+			lList.add(s);
+			return true;
+			//System.out.println("Station add Line : Error repeated ");
+			//throw new Exception("Station add Line : Error repeated ");
 		}
 	}
 	/*public boolean addBusLine (Line s) throws Exception {

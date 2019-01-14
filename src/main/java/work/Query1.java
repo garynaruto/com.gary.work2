@@ -14,82 +14,118 @@ import preproess.*;
 
 public class Query1 {
 	//RTree<Position, Geometry> tree = RTree.star().minChildren(3).maxChildren(6).create();//RTree.asString()
-	public static int min = 1;// minChildren
-	public static int max = 6;// maxChildren
-	public static int k = 4;  //k of KNN
-	public static int disTotime = 12; //walk Parameter
+	//	String POIfile = "src/main/resources/p_loc.txt";
+	//	String stationfile = "src/main/resources/s_loc.txt";
+	//	String stopfile = "src/main/resources/small_公車站牌資料.csv";
+	//	String lineTimeFile = "src/main/resources/發車.csv";
 	
 	public static void main(String[] args) {
+		int min = 1;// minChildren
+		int max = 6;// maxChildren
+		int k = 4;  //k of KNN
+		int disTotime = 1; //walk Parameter
+		Combination.disTotime = disTotime;
+		
+		String POIfile = "src/main/resources/realData/sample 250.csv";
+		String stationfile = "src/main/resources/realData/STATION.csv";
+		String stopfile = "src/main/resources/realData/路線UTF-8.csv";
+		String lineTimeFile = "src/main/resources/realData/路線 time.csv";
+		query(min, max, k, disTotime,POIfile,stationfile,stopfile, lineTimeFile);
+	}
+	
+	static void query(int min,int max,int k,int disTotime,String POIfile,String stationfile,String stopfile,String lineTimeFile) {
 
 		/* read POI data & build Rtree */
-		List<POI> POIList = mainClass.readPOIData("src/main/resources/p_loc.txt");
+		System.out.println("read POI data");
+		List<POI> POIList = mainClass.readPOIData(POIfile);
 		RTree<Position, Geometry> ptree = RTree.star().minChildren(min).maxChildren(max).create();
 		ptree = rtreeInsertPOI(ptree ,POIList);
-		
+		System.out.println("read Station data");
 		/* read station data & build Rtree */
-		List<Station> stationList = mainClass.readStationData("src/main/resources/s_loc.txt");
+		List<Station> stationList = mainClass.readStationData(stationfile);
 		RTree<Position, Geometry> stree = RTree.star().minChildren(min).maxChildren(max).create();
 		stree = rtreeInsertStation(stree ,stationList);
+		Step.stationList = stationList;
 		
+		System.out.println("build Edge");
 		/* read Line data build Edge  */
-		Map<String, Line> map = mainClass.readbusData("src/main/resources/small_公車站牌資料.csv", stationList);
-		List<Edge> elist = mainClass.readStarTimeData("src/main/resources/發車.csv",stationList,map);
-		
-		/* Calculate the distance of the station to POI or Station  */
+		Map<String, Line> map = mainClass.readbusData(stopfile, stationList);
+		List<Edge> elist = mainClass.readStarTimeData( lineTimeFile,stationList,map);
+
+		long aa = System.currentTimeMillis();
+/*undone 	Calculate the distance of the station to POI or Station  */
 		Map<String, Double> m =  mainClass.distance(stationList, POIList);
-		
-		/*********  query start  ******* loc(5,3) - p1 - p2 - loc  */
+
+	    long bb = System.currentTimeMillis();
+	    System.out.println("Serializable "+(bb-aa));
+		/********  query data  ***********/
+		//int star1 = (int) (Math.random() * POIList.size());
+		//int star2 = (int) (Math.random() * POIList.size());
+		//POI p1 = POIList.get(star1);
+		//POI p2 = POIList.get(star2);
+	    POI p1 = POIList.get(237);
+	  	POI p2 = POIList.get(237);
+		Point start = Geometries.point(p1.x,p1.y);
+		Point end = Geometries.point(p2.x,p2.y);
+		System.out.println("start"+p1.name);
+		System.out.println("end"+p2.name);
 		
 		int queryTime = mainClass.timeConverter("09:00");
-		Point start = Geometries.point(6,2);
-		Point end = Geometries.point(6,2);
+		//int randomPOI1 = (int) (Math.random() * POIList.size());
+		//int randomPOI2 = (int) (Math.random() * POIList.size());
+		int randomPOI1 = 193;
+		int randomPOI2 = 233;
+		int randomPOI3 = 133;
+		
 		List<POI> queryPOI = new ArrayList<POI>();
-		POIList.get(0).stayTime = 20;
-		POIList.get(1).stayTime = 20;
-		queryPOI.add(POIList.get(0));
-		queryPOI.add(POIList.get(1));
+		System.out.println("p1"+POIList.get(randomPOI1).name);
+		System.out.println("p2"+POIList.get(randomPOI2).name);
+		System.out.println("p3"+POIList.get(randomPOI3).name);
+		POIList.get(randomPOI1).stayTime = 20;
+		POIList.get(randomPOI2).stayTime = 20;
+		POIList.get(randomPOI3).stayTime = 20;
+		queryPOI.add(POIList.get(randomPOI1));
+		queryPOI.add(POIList.get(randomPOI2));
+		queryPOI.add(POIList.get(randomPOI3));
 		//Path.sLoc = start;
 		//Path.dLoc = end;
 		//Path.map = m;
 		Combination.map = m;
+		
+		/********** query start **************/
+		System.out.println("Start");
 		long startTime = System.currentTimeMillis();
+		long endTime = System.currentTimeMillis();
 		/* enumerate combination */
-		List<Combination> combinations = eum(start, end, queryPOI ,stree);
-		
-		System.out.println("combinations : " + combinations.size() );
-		//combinations.forEach(a->System.out.println(a));
-//		System.out.println("start : "+start );
-//		System.out.println("end : "+end );
-//		System.out.println("queryPOI : "+queryPOI );
-//		System.out.println("combinations : "+combinations );
-//		System.out.println("combinations : "+combinations.size() );
-//		System.out.println("queryTime : "+queryTime );
-		
+		//System.out.println("eum");
+		List<Combination> combinations = eum(start, end, queryPOI ,stree, k);
+		System.out.println(combinations.size());
 		/* calculate combination Score */
+		//System.out.println("calScore");
 		Queue<Combination> queue = calScore(combinations);
 		
 		//queue.forEach(a->{System.out.println(a);});
-		
-		for(int i=0; i<100; i++) {
-			System.out.println(queue.poll());
-		}
+		//System.out.println("queue.size() "+queue.size());
 		
 		
 		/* find real-path with pruning */
-		System.out.println("find real-path :");
+		//System.out.println("find real-path :");
 		Path2 ans = new Path2(Integer.MAX_VALUE);
 		int i=0;
+		boolean flg = true;
 		while(!queue.isEmpty()) {
 			//System.out.println(i);
 			Combination tmp = queue.poll();
 			//System.out.println("queue.poll"+tmp);
-			//System.out.println(" tmp :"+ tmp);
-			if(queryTime + tmp.time > ans.time) {
-				//System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
+			
+			if(flg && queryTime + tmp.time > ans.time) {
+				flg = false;
+				System.out.println("break : "+ queryTime+"/"+ tmp.time+"/"+ans.time);
 				System.out.println("break : "+ i);
-				break;
+				endTime = System.currentTimeMillis();
+				System.out.println("CPU Time : "+ (endTime-startTime));
+				//break;
 			}
-			//System.out.println(" open :");
 			Path2 p = openCom2(tmp, elist, stationList, queryTime, ans.time);
 			if(p != null && p.time < ans.time) {
 				ans = p;
@@ -97,37 +133,44 @@ public class Query1 {
 				
 			}
 			i++;
+			//System.out.println(i+" "+p);
+			//if(i>5) break;
 		}
 		
-		long endTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis();
 		System.out.println("ans>"+ans);
 		System.out.println("CPU Time : "+ (endTime-startTime));
 		System.out.println("done");
 	}
 	public static Path2 openCom2(Combination com, List<Edge> elist, List<Station> stationList, int queryTime, int bestTime) {
 		Path2 out = new Path2();
-		List<Edge> realPath = null;
-		System.out.println("openCom2 : "+com);
+		List<Edge> realPath = new ArrayList<Edge>();
+		//System.out.println("openCom2 : "+com);
 		out.time = queryTime;
 		for(Step s :com.stepList) {
 			if(s.way == Step.Action.bus) {
-				System.out.println("Step.Action.bus");
+				//System.out.print("bus ");
 				s.starTime = out.time;
 				out.time += Step.findrealPath(realPath, s);
-				if(realPath == null) {
+
+				if(realPath.isEmpty()) {
+					//System.out.println(s+" realPath == null");
 					return null;
 				}
 				s.Edges = new ArrayList<Edge>(realPath);
-				out.stepList.add(s);
+				out.stepList.addAll(realPath);
+				
 			}
 			else {
 				if(s.way == Step.Action.POI) {
-					System.out.println("Step.Action.POI");
+					//System.out.print("POI ");
 					//check wait or not or can't 
 					s.starTime = out.time;
 					POI target = (POI)s.a;
 					if (s.starTime+target.stayTime > target.endTime ){
-						return null;
+						//System.out.println("POI s.starTime+target.stayTime > target.endTime ");
+						//System.out.println("");
+						//return null;
 					}
 					if (s.starTime < target.starTime) {//wait POI open
 						s.waitTime = target.starTime - s.starTime;
@@ -137,13 +180,14 @@ public class Query1 {
 					out.stepList.add(s);
 					
 				}else if(s.way == Step.Action.walk) {
-					System.out.println("Step.Action.walk");
+					//System.out.print("walk ");
 					s.starTime = out.time;
 					out.time += s.costTime;
 					out.stepList.add(s);
 				}
 			}
 		}
+		//System.out.println("");
 		return out;//min time real-path in this combination
 	}
 	
@@ -160,7 +204,7 @@ public class Query1 {
 		return out;
 	}
 	
-	public static List<Combination> eum(Point start, Point end, List<POI> queryPOI , RTree<Position, Geometry> stree) {
+	public static List<Combination> eum(Point start, Point end, List<POI> queryPOI , RTree<Position, Geometry> stree, int k) {
 		
 		Position startPosition  = new Position(start,"start");
 		Position endPosition  = new Position(end,"end");

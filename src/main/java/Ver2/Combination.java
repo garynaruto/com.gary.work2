@@ -1,7 +1,7 @@
 package Ver2;
 import java.util.*;
 import preproess.*;
-import work.Query1;
+
 
 public class Combination implements Comparable<Combination>{
 	
@@ -9,6 +9,7 @@ public class Combination implements Comparable<Combination>{
 	public List<Step> stepList;
 	public int time; // ideal time
 	public static Map<String, Double> map;
+	public static int disTotime = 0;
 	public Combination() {
 		super();
 		pList = new ArrayList<>();
@@ -55,15 +56,21 @@ public class Combination implements Comparable<Combination>{
 		if(a instanceof Station) {
 			if(b instanceof Station) {
 				//s2s
-				//idealTime map
-				out = map.get(a.name+b.name);
+//change to dij ideal Time 	*****************************************
+				out = (map.get(a.name+b.name))*1.5;
 				stepList.add(new Step(a, b, (int)out, Step.Action.bus));
 				
 				return (int)out;
 			}
 		}
+		Double t = map.get(a.name+b.name);
 		
-		out = walkParameter(Math.hypot(a.x-b.x, a.y-b.y));
+		if(t == null) {
+			out = walkParameter(Math.hypot(a.x-b.x, a.y-b.y));
+		}
+		else {
+			out = walkParameter(t);
+		}
 		stepList.add(new Step(a, b, (int)out, Step.Action.walk));
 		
 		if(b instanceof POI) {
@@ -82,7 +89,10 @@ public class Combination implements Comparable<Combination>{
 	}
 	public int walkParameter(double d) {
 
-		return (int)(d*Query1.disTotime);
-		
+		return (int)(d*disTotime);	
+	}
+	public static int walkParameter(Double d) {
+
+		return (int)(d*disTotime);	
 	}
 }
