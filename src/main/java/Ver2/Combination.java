@@ -9,7 +9,7 @@ public class Combination implements Comparable<Combination>{
 	public List<Step> stepList;
 	public int time; // ideal time
 	public static Map<String, Double> map;
-	public static int disTotime = 0;
+	public static int disTotime;
 	public Combination() {
 		super();
 		pList = new ArrayList<>();
@@ -49,7 +49,11 @@ public class Combination implements Comparable<Combination>{
 		
 		return time;
 	}
-	// new step 
+	//change to dij ideal Time 	*****************************************
+	public static int idealTimes(Position a, Position b) {
+		double out = (map.get(a.name+b.name))*1.5;
+		return (int)out;
+	}
 	public int idealTime(Position a, Position b) {
 		//1.p2s 2.s2s 3.p2p 
 		double out = 0;

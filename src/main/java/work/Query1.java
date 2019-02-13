@@ -22,10 +22,10 @@ public class Query1 {
 	public static void main(String[] args) {
 		int min = 1;// minChildren
 		int max = 6;// maxChildren
-		int k = 4;  //k of KNN
+		int k = 3;  //k of KNN
 		int disTotime = 1; //walk Parameter
 		Combination.disTotime = disTotime;
-		
+		System.out.println("K="+k);
 		String POIfile = "src/main/resources/realData/sample 250.csv";
 		String stationfile = "src/main/resources/realData/STATION.csv";
 		String stopfile = "src/main/resources/realData/¸ô½uUTF-8.csv";

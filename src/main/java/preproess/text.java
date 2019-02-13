@@ -27,12 +27,8 @@ public class text {
                 }else {
                 	
                 	System.out.println(s + "," + country[3]+ "," +0);
-
                 }
-                
-
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

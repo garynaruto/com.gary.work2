@@ -68,12 +68,13 @@ public class KNN {
 //		while(!a.isEmpty()) {
 //			output.add((Station)a.poll().value());
 //		}
-		return output;
+		return output; 
 	}
 	public static PriorityQueue<Entry<Position, Geometry>> nn(RTree<Position, Geometry> r, Point p, int k) {
 		//Queue<Node<String, Geometry>> queue = new LinkedList<Node<String, Geometry>>();
 		PriorityQueue<Node<Position, Geometry>> queue = new PriorityQueue<Node<Position, Geometry>>(10000, new NodeComparator());
 		PriorityQueue<Entry<Position, Geometry>> Ans = new PriorityQueue<Entry<Position, Geometry>>(k, new EntryComparator());
+		//PriorityQueue<Entry<Position, Geometry>> Ans = new PriorityQueue<Entry<Position, Geometry>>((Entry<Position, Geometry> s1, Entry<Position, Geometry> s2)-> s1.geometry().distance(p) - s2.geometry().distance(p));
 		
 		NodeComparator.p = p;
 		EntryComparator.p = p;
@@ -83,7 +84,7 @@ public class KNN {
 			Node<Position, Geometry> tmp = queue.poll();
 			//System.out.println(tmp.getClass().getName());
 			if(tmp instanceof NonLeaf) {
-				((NonLeaf<Position, Geometry>) tmp).getClass().getName();
+				//((NonLeaf<Position, Geometry>) tmp).getClass().getName();
 				queue.addAll(((NonLeaf<Position, Geometry>) tmp).children());
 			}
 			else if(tmp instanceof LeafDefault) {
@@ -100,7 +101,7 @@ public class KNN {
 						break;
 					}
 				}
-			}			
+			}
 		}
 		return Ans;
 	}
@@ -130,9 +131,6 @@ public class KNN {
         }
         return data;
 	}
-	
-	
-	
 }
 
 

@@ -30,7 +30,7 @@ public class Station extends Position{
 		for(Line n : lList) {
 			s=s+n.name+"-";
 		}
-		return this.name;
+		return "s"+this.name;
 		//return id+":"+s;
 		//return "s("+id+","+x+","+y+")";
 	}
