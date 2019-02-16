@@ -55,7 +55,7 @@ public class mainClass {
 				Double d =Math.hypot(s.x-s2.x, s.y-s2.y);
 				out.put(s.name+s2.name, d);
 				if(s!=s2) {
-					queue.add(new Edge(Line.getWalk(),s,s2,0,Combination.walkParameter(d)));
+					queue.add(new Edge(Line.getWalk(),s,s2,0,Combination.walkParameter(d)));//************
 				}
 			}
 			for(int i=0;i<5; i++) {

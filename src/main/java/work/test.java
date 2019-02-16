@@ -6,9 +6,9 @@ import java.util.List;
 
 public class test {
 	public static void main(String[] args) {
-		String[] p1 = { "1", "2","3"};
-		String[] p2 = { "1", "2","3"};
-		String[] p3 = { "+", "-" };
+		String[] p1 = {"1"};
+		String[] p2 = {"2"};
+		String[] p3 = {"3"};
 		List<String> l1 = Arrays.asList(p1);
 		List<String> l2 = Arrays.asList(p2);
 		List<String> l3 = Arrays.asList(p3);

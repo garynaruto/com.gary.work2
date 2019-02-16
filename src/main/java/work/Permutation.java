@@ -40,7 +40,7 @@ public class Permutation {
     }
 
     public static void main(String[] args) {
-        for(List<Integer> pl : perm(Arrays.asList(1, 2, 3, 4))) {
+        for(List<Integer> pl : perm(Arrays.asList(1, 2, 3))) {
             System.out.println(pl);
         }
     }

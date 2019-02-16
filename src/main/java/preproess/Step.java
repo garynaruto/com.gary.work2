@@ -41,10 +41,7 @@ public class Step {
 		queue.add(new Expansion((Station)src.a, (Station)src.b, src.starTime));
 		//int i=0;
 		while(!queue.isEmpty()) {
-//			i++;
-//			if(i>10) {
-//				break;
-//			}
+//			
 			Expansion e = queue.poll();
 			//System.out.println("poll :" +e.edgeList);
 			if(!e.edgeList.isEmpty() && e.edgeList.get(e.edgeList.size()-1).b.name.equals(src.b.name)) {
@@ -58,9 +55,9 @@ public class Step {
 			queue.addAll(tmp);
 			//tmp.forEach(t->System.out.println("->"+t));
 		}
-		System.out.println("No realPath");
+		//System.out.println("No realPath");
 		ans = null;
-		return 0;//no ans
+		return -1;//no ans
 	}
 	public enum Action {
 	    walk,

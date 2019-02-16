@@ -1,5 +1,6 @@
 package Ver2;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.github.davidmoten.rtree.RTree;
@@ -9,7 +10,7 @@ import com.github.davidmoten.rtree.geometry.Point;
 import preproess.*;
 import work.*;
 
-public class Query2 {
+public class Query2v2 {
 	//RTree<Position, Geometry> tree = RTree.star().minChildren(3).maxChildren(6).create();//RTree.asString()
 	//	String POIfile = "src/main/resources/p_loc.txt";
 	//	String stationfile = "src/main/resources/s_loc.txt";
@@ -93,8 +94,8 @@ public class Query2 {
 		
 		System.out.println(query(start,end,queryPOI,stree,k,queryTime,elist, stationList));
 	}
-	
-	static String query(Point start,Point end,List<POI> queryPOI,RTree<Position, Geometry> stree,int k,
+	public static Map<String, List<List<Position>>> Smap;
+	public static String query(Point start,Point end,List<POI> queryPOI,RTree<Position, Geometry> stree,int k,
 			int queryTime,List<Edge> elist,List<Station> stationList) {
 		
 		
@@ -103,18 +104,25 @@ public class Query2 {
 		long startTime = System.currentTimeMillis();
 		long endTime;
 		/* enumerate combination */
-		List<Combination> combinations = eum(start, end, queryPOI ,stree, k);
-		//System.out.println("size : "+ combinations.size());
+		System.out.println("eum");
+		List<List<Position>> com = eumPosition(start, end, queryPOI);
 		
-/*   times filter    */
+		//com.forEach(a->{a.forEach(s->System.out.print(s+" "));System.out.println();});
 		
-		/* calculate combination Score */
+		
+		//List<Combination> combinations = eum(start, end, queryPOI ,stree, k);
+		System.out.println("size : "+ com.size());
+		/*   times filter    */
+		
 		System.out.println("tree build");
-		TreeNode root = buildTree(combinations);
+		TreeNode2v root = buildTree2(com);
+		root.traversal(" ");
+		/* calculate combination Score */
+		
 		//root.traversal("");
 		/*  find path  */
 		System.out.println("find path");
-		Path2 ans = findPath(root, queryTime);
+		Path2 ans = findPath(start,end,root, queryTime,queryPOI,stree, k);
 		
 		
 		endTime = System.currentTimeMillis();
@@ -122,17 +130,66 @@ public class Query2 {
 		System.out.println("CPU Time : "+ (endTime-startTime));
 		System.out.println("done");
 		return "k="+k+"\n"+"ans>"+ans +"\n"+"CPU Time : "+ (endTime-startTime);
+		//return "done";
 	}
+	public static TreeNode2v buildTree2(List<List<Position>> combinations) {
+		
+		System.out.println("buildTree");
+		TreeNode2v root = new TreeNode2v(combinations.get(0).get(0));
+		for(int i=0; i<combinations.size(); i++) {
+			root.insert(combinations.get(i));
+		}
+		//root.traversal("");
 
+		
+		return root;
+		
+	}
+	public static void stepTable(TreeNode2v node) {
+		for(int i=0; i<node.Nexts.size(); i++) {
+			Position p = node.Nexts.get(i);
+			if( p instanceof POI) {
+				POI poi = (POI)p;
+				
+				
+				node.StepTable.get(i).addAll(null);
+			}
+		}
+		node.child.forEach(a->stepTable(a));
+	}
 	
-	public static Path2 findPath(TreeNode root, int time) {
+	public static List<List<Position>> eumPosition(Point start, Point end, List<POI> queryPOI){
+		List<List<Position>> out = new ArrayList<List<Position>>();
+		Position startPosition  = new Position(start,"start");
+		Position endPosition  = new Position(end,"end");
+		
+		List<Position> tmp = new ArrayList<Position>(queryPOI);
+		
+		out = Permutation.perm(tmp);
+		out.forEach(a->{a.add(0,startPosition);a.add(endPosition);});
+		
+		
+		return out;
+	}
+	public static List<Station> startStation;
+	public static List<Station> endStation;
+	public static Path2 findPath(Point start,Point end,TreeNode2v root, int time, List<POI> queryPOI,RTree<Position, Geometry> stree, int k) {
 		Path2 out = new Path2();
 		out.time = time;
-		TreeNode node = root;
+		TreeNode2v node = root;
+		
+		/* KNN for all position */
+		startStation = KNN.KNNQuery2(stree,start, k);
+		endStation = KNN.KNNQuery2(stree, end, k);
+		queryPOI.forEach(p->{
+			p.NNstation = KNN.KNNQuery2(stree, Geometries.point(p.x, p.y), k);
+		});
+		
+		
 		
 		while(!node.p.name.equals("end")){
 			//System.out.println("!equals end");
-			int index = chosePOI(node.Nexts,node.StepTable, time);
+			int index = chosePOI(node, time);
 			
 			time = choseStep(node.StepTable.get(index),out);
 			node = node.child.get(index);
@@ -142,8 +199,15 @@ public class Query2 {
 		
 		return out;
 	}
-	public static int chosePOI(List<Position> nexts,List<List<List<Position>>> table, int time) {
+	public static int chosePOI(TreeNode2v node, int time) {
+		List<Position> nexts = node.Nexts;
+		List<List<List<Position>>> table = node.StepTable;
 		if(nexts.get(0) instanceof POI) {
+			
+			for(int i=0; i<node.Nexts.size(); i++) {
+				node.StepTable.addAll(setTable(node.p, node.Nexts.get(i)));
+			}
+			
 			int index = -1;
 			//List<POI> result = nexts.stream().map(a->(POI)a).collect(Collectors.toList());
 			int minTime = Integer.MAX_VALUE;
@@ -167,7 +231,6 @@ public class Query2 {
 			return 0;
 		}
 	}
-	//
 	public static int choseStep(List<List<Position>> table, Path2 out) {
 		List<Step> ans = null;
 		int ansTime = Integer.MAX_VALUE;
@@ -214,23 +277,6 @@ public class Query2 {
 		out.stepList.addAll(ans);
 		return ansTime;
 	}
-	//計算step總時間
-	//public static int cosTime(List<Step> l) {}
-	public static TreeNode buildTree(List<Combination> combinations) {
-		
-		//System.out.println("buildTree");
-		TreeNode root = new TreeNode(combinations.get(0).pList.get(0));
-		for(int i=0; i<combinations.size(); i++) {
-			//System.out.println(i);
-			root.insert(combinations.get(i));
-		}
-		//root.traversal("");
-		//root.StepTable.forEach(a->a.forEach(b->System.out.println(b)));
-		return root;
-	}
-	
-	
-	
 	public static List<Combination> eum(Point start, Point end, List<POI> queryPOI , RTree<Position, Geometry> stree, int k) {
 		Position startPosition  = new Position(start,"start");
 		Position endPosition  = new Position(end,"end");

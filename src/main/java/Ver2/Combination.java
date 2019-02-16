@@ -9,7 +9,7 @@ public class Combination implements Comparable<Combination>{
 	public List<Step> stepList;
 	public int time; // ideal time
 	public static Map<String, Double> map;
-	public static int disTotime;
+	public static double disTotime;
 	public Combination() {
 		super();
 		pList = new ArrayList<>();

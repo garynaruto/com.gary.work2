@@ -1,6 +1,5 @@
 package Ver2;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import preproess.*;
 
@@ -26,7 +25,7 @@ public class TreeNode {
 		//System.out.println("insert :"+com.pList);
 		
 		TreeNode node = this;
-		List<Position> buf = new LinkedList<Position>();
+		List<Position> buf = new  ArrayList<Position>();
 		buf.add(com.pList.get(0));
 		//System.out.println("com.pList.get(0) :"+com.pList.get(0));
 		for(int i=1; i<com.pList.size(); i++) {
@@ -42,7 +41,7 @@ public class TreeNode {
 					node.child.add(newChild);
 					node.Nexts.add(tmp);
 					List<List<Position>> tmpList = new ArrayList<List<Position>>();
-					tmpList.add(new LinkedList<Position>(buf));
+					tmpList.add(new  ArrayList<Position>(buf));
 					node.StepTable.add(tmpList);
 					node = newChild;
 				}
@@ -62,7 +61,7 @@ public class TreeNode {
 					if(!flg) {
 						//System.out.println("!f");
 						//System.out.println("buf:"+buf.t);
-						stepList.add(new LinkedList<Position>(buf));
+						stepList.add(new  ArrayList<Position>(buf));
 					}
 					node = node.child.get(index);
 				}
